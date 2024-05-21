@@ -32,7 +32,7 @@ int main() //IO ポート設定
 
 - グラフ
 
-## 2. コンバレータ
+## 2. コンパレータ 
 
 ### 穴埋め
 
@@ -44,7 +44,7 @@ int main() //IO ポート設定
 
 - 比較器を使用するには、ACDをOFFにする。
 - 入力端子は+端子の"AIN0"と-端子の"AIN1"であり、この電圧を比較する。
-- 比較するには、ACBGを論理値"false"、ACMEを論理値"true"、ADENを論理値"false"にすればよい。
+- 比較するには、ACBGを論理値"0"、ACMEを論理値"0"、ADENを論理値"1"にすればよい。
 - この図の他、以下のページ、項目を参照する。
   - "243"ページ"表23-1"
   - "12"ページ"図1-1"
@@ -54,7 +54,7 @@ int main() //IO ポート設定
 
 - ピン配置は図"1-1"、表"14-9"を参照すればいい。
 - AIN0はポート"D"の"6"bit目、ICの"8"番ピンである。
-- AIN0はポート"D"の"7"bit目、ICの"9"番ピンである。
+- AIN1はポート"D"の"7"bit目、ICの"9"番ピンである。
 
 5. 省電力設定
 
@@ -81,11 +81,11 @@ int main() //IO ポート設定
 
 7. まとめ
 
-PRR 0x64 0 なし  
+PRR 0x64 なし 0  
 ACSR 0x30 7,6 なし
-ADCSRB 0x7B なし 6
-ADCSRA 0x7A 7 なし
-DIDR0 0x7E なし なし
+ADCSRA 0x7A なし 7
+ADCSRB 0x7B 6 なし 
+DIDR0 0x7E なし 0,1,2,3,4,5
 DIDR1 0x7F なし 1,0
 
 8. 遅延時間
@@ -98,5 +98,117 @@ DIDR1 0x7F なし 1,0
 
 - 例えば、PINB:0x03番地、PORTB:0x05番地、DDRB:0x04番地、PRR:0x64番地
 - IN、OUT命令は、0x00~0x3F番地のアドレスに対して使用
-- LDS、STS命令は0x60-0xFF番地のアドレスに対して使用
+- LDS、STS命令は0x60~0xFF番地のアドレスに対して使用
 - SBI、CBI命令は0x00~0x1F番地のアドレスに対して使用
+
+### 1. テキスト「コンパレータの使い方」をもとにコンパレータを設定し、動作を確認しなさい。V+に三角波(ファンクションジェネレータ)、V-に定電圧(2.5V)を与えオシロスコープで確認すること。
+
+コード
+```c
+#define F_CPU 20000000UL
+#include <asf.h>
+#include <util/delay.h>
+int main (void)
+{
+	DDRB = 0b11111111;
+	DDRD = 0b00000000;
+	PRR = PRR | (1<<0);
+	ACSR = ACSR & (~(1<<6));
+	ACSR = ACSR & (~(1<<7));
+	ADCSRA = ADCSRA | (1<<7);
+	ADCSRB = ADCSRB & (~(1<<6));
+	DIDR0 = DIDR0 | (1<<0);
+	DIDR0 = DIDR0 | (1<<1);
+	DIDR0 = DIDR0 | (1<<2);
+	DIDR0 = DIDR0 | (1<<3);
+	DIDR0 = DIDR0 | (1<<4);
+	DIDR0 = DIDR0 | (1<<5);
+	DIDR1 = DIDR1 | (1<<0);
+	DIDR1 = DIDR1 | (1<<1);
+	while(true){
+		_delay_us(0.6);
+		if((ACSR & (1 << 5))!=0){
+			PORTB = 0b00000000;
+		}else if((ACSR & (1 << 5))==0){
+			PORTB = 0b11111111; 
+		}
+	}
+}
+```
+
+オシロスコープの写真
+
+### 2. VoをV-に接続する。
+
+```c
+#define F_CPU 20000000UL
+#include <asf.h>
+#include <util/delay.h>
+int main (void)
+{
+	DDRB = 0b11111111;
+	DDRD = 0b00000000;
+	PRR = PRR | (1<<0);
+	ACSR = ACSR & (~(1<<6));
+	ACSR = ACSR & (~(1<<7));
+	ADCSRA = ADCSRA | (1<<7);
+	ADCSRB = ADCSRB & (~(1<<6));
+	DIDR0 = DIDR0 | (1<<0);
+	DIDR0 = DIDR0 | (1<<1);
+	DIDR0 = DIDR0 | (1<<2);
+	DIDR0 = DIDR0 | (1<<3);
+	DIDR0 = DIDR0 | (1<<4);
+	DIDR0 = DIDR0 | (1<<5);
+	DIDR1 = DIDR1 | (1<<0);
+	DIDR1 = DIDR1 | (1<<1);
+	bool flag = true;
+	while(true){
+		_delay_us(120);
+		if(flag){
+			flag = false;
+			PORTB = 0b11111111;
+		}else{
+			flag = true;
+			PORTB = 0b00000000;
+		}
+	}
+}
+```
+## 3. A/D変換
+
+```c
+#define F_CPU 20000000UL
+#include <asf.h>
+#include <util/delay.h>
+int main (void)
+{
+	DDRB = 0b11111111;
+	DDRD = 0b00000000;
+	PRR = PRR | (1<<0);
+	ACSR = ACSR & (~(1<<6));
+	ACSR = ACSR & (~(1<<7));
+	ADCSRA = ADCSRA | (1<<7);
+	ADCSRB = ADCSRB & (~(1<<6));
+	DIDR0 = DIDR0 | (1<<0);
+	DIDR0 = DIDR0 | (1<<1);
+	DIDR0 = DIDR0 | (1<<2);
+	DIDR0 = DIDR0 | (1<<3);
+	DIDR0 = DIDR0 | (1<<4);
+	DIDR0 = DIDR0 | (1<<5);
+	DIDR1 = DIDR1 | (1<<0);
+	DIDR1 = DIDR1 | (1<<1);
+	PORTB = 0b00000000;
+	while(true){
+		PORTB = 0b00000000;
+		_delay_us(120);
+		for(int i = 3;i >= 0;i--){
+			PORTB = PORTB | (1 << i);
+			_delay_us(120);
+			if((ACSR & (1 << 5))==0){
+				PORTB = PORTB & (~(1 << i));
+			}
+		}
+		_delay_us(120);
+	}
+}
+```
