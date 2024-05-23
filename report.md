@@ -277,7 +277,7 @@ D/A出力電圧が入力電圧と比較するために、bitに対して0->1と�
 ピーク検出器はサンプリング・ホールド回路がサンプリングしたデータから最大値/最小値を求め、それらをペアにして表示するものである。
 これらは通常、アナログ-デジタルコンバーターで使用され、変換プロセスを台無しにする可能性のある入力信号の変動を排除します。
 
-参考:[wikipedia](https://en.wikipedia.org/wiki/Sample_and_hold#References)
+参考: [wikipedia](https://en.wikipedia.org/wiki/Sample_and_hold#References)
 
 - 考察
 
