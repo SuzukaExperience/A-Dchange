@@ -30,7 +30,11 @@ int main() //IO ポート設定
 
 - 表
 
+![1-table](png/1-graph.png)
+
 - グラフ
+
+![1-graph](png/1-table.png)
 
 ## 2. コンパレータ
 
@@ -115,7 +119,7 @@ int main() //IO ポート設定
 
 - 結果
 
-![2-1result](/png/2-1.png)
+![2-1result](jpg/2-1.png)
 
 - コード
 ```c
@@ -156,7 +160,7 @@ int main (void)
 
 - 結果
 
-![2-2LtoHresult](/png/2-2LtoH.png)![2-2HtoLresult](/png/2-2HtoL.png)  
+![2-2LtoHresult](png/2-2LtoH.png)![2-2HtoLresult](png/2-2HtoL.png)  
 
 - Voが安定するまでの時間
 
@@ -248,7 +252,7 @@ int main (void)
 
 - 結果
 
-![3-2result](/png/3-2.png)
+![3-2result](png/3-2.png)
 
 3. A/D変換中に入力電圧が変化するとどのようになるか。実験で確認せよ。
 
@@ -258,7 +262,7 @@ int main (void)
 
 - 結果
 
-![3-3result](/png/3-3.png)
+![3-3result](png/3-3.png)
 
 ## 課題
 
